@@ -38,7 +38,7 @@ print("Memory Consumed by Transaction mapping = " + str(round(sys.getsizeof(txn_
 
 
 ## Creating transaction - Unix time mapping
-
+path = r"C:\Users\Ashish Lakhmani\Downloads\edges2010"
 mapping_tx_time = {}
 for root, dir, files in os.walk(path):
     for f in files:
@@ -57,7 +57,7 @@ for root, dir, files in os.walk(path):
 ## 2. Address- Integer ID mapping
 
 list_addresses = []
-path = r"C:\Users\japje\BDAProj\edges2010"
+path = r"C:\Users\Ashish Lakhmani\Downloads\edges2010"
 for root, dir, files in os.walk(path):
     for f in files:
         if("outputs" in f):
@@ -86,7 +86,7 @@ print("Memory Consumed by Transaction mapping = "+ str(round(sys.getsizeof(addr_
 ## 3. Output ID --> Unix Time
 
 list_addresses = []
-path = r"C:\Users\japje\BDAProj\edges2010"
+path = r"C:\Users\Ashish Lakhmani\Downloads\edges2010"
 mapping_tx_to_op = {}
 # mapping_op_time = {}
 data_op = []
@@ -129,7 +129,7 @@ for root, dir, files in os.walk(path):
                     global_index = global_index+1
                 global_index = global_index+1
 
-data_op = pd.DataFrame(np.concatenate(data_op), columns= ['op_id', 'addr_id', 'amt', 'time' ])
+data_op = pd.DataFrame(np.concatenate(data_op), columns= ['op_id', 'addr_id', 'amt', 'time'])
 data_op['addr_id'] = data_op['addr_id'].astype(np.uint32)
 data_op['amt'] = data_op['amt'].astype(np.uint64)
 data_op['op_id'] = data_op['op_id'].astype(np.uint32)
@@ -147,7 +147,7 @@ count_no_match = 0
 ####################
 
 
-path = r"C:\Users\japje\BDAProj\edges2010"
+path = r"C:\Users\Ashish Lakhmani\Downloads\edges2010"
 # mapping_tx_to_op = {}
 mapping_ip = {}
 for root, dir, files in os.walk(path):
