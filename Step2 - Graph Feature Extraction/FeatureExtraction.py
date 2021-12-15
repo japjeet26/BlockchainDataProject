@@ -50,32 +50,33 @@ for day in range(min_day, max_day+1):
     ###############################################
     # Feature Extraction (Simple features)
     ###############################################
-    count_address = {}
-    address_covered = []
+    address_covered = set()
+
     for v in g_day.vs.select(type_eq = False):
         in_deg = v.indegree()
         out_deg = v.outdegree()
         in_amount = v['amount']
         out_amount = in_amount if out_deg > 0 else 0
-        addr_props[v["address"]][0] += in_deg
-        addr_props[v["address"]][1] += out_deg
-        addr_props[v["address"]][2] += in_amount
-        addr_props[v["address"]][3] += out_amount
+        address = v["address"]
+        addr_props[address][0] += in_deg
+        addr_props[address][1] += out_deg
+        addr_props[address][2] += in_amount
+        addr_props[address][3] += out_amount
         
         ###############################################
         # BitcoinHeist Feature - Count
         ###############################################
-        count_address[v["address"]] = 0
+
         for t in list_starter_txs:
             if(g_day.get_shortest_paths(t, v.index)!=[[]]):
-                addr_props[v["address"]][4] += 1
-        address_covered.append(v['address'])
+                addr_props[address][4] += 1
+        
+        
         ## to limit non-ransomware outputs to 2000 per day
         if(not v['address'] in set_ransomware):
-            count_non_ransomware_day += 1
-        if count_non_ransomware_day >= 2000:
+            address_covered.add(address)
+        if len(address_covered) > 2000:
             break
-    address_covered = set(address_covered)
     
     
     ###############################################
@@ -104,7 +105,7 @@ for day in range(min_day, max_day+1):
     df_features['address'] = addr_props.keys()
     df_features['day'] = day
     
-    df_features.merge(df_weights, on = 'address', how = 'left')
+    df_features = df_features.merge(df_weights, on = 'address', how = 'left')
     
     all_days.append(df_features)
  
@@ -116,4 +117,5 @@ label_df = pd.DataFrame(list(set(df_all_features['address'])), columns= ['addres
 label_df['label'] = np.random.choice([0, 1], size=len(label_df.index), p=[.95, .05])
 
 df_all_features = df_all_features.merge(label_df, on = 'address', how = 'left')
-df_all_features.to_csv(r'C:\Users\japje\BDAProj\Working iGraph/features_2010_new.csv')
+df_all_features['weight (BTCH)'].fillna(0, inplace = True)
+df_all_features.to_csv(r'C:\Users\japje\BDAProj\Working iGraph/features_2010_new.csv', index=False, header=True, columns = ['day', 'address', 'sum in-degree', 'sum out-degree (BTCH)', 'sum in-amount', 'sum out-amount (BTCH)', 'count (BTCH)', 'weight (BTCH)', 'label'])
