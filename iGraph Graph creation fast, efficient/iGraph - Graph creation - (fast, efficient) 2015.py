@@ -13,10 +13,18 @@ import sys
 import math
 
 
-## Creating the mapping
+## Creating the transaction mapping
 ## 1. transactionHash- Integer ID mapping
 
+## Initialize the list of transaction hashes
 list_tx_hashes = []
+
+## Traverse all text files - both input and output
+## Parse line by line and extract all the transaction hashes
+## From input files - Hash of input transaction as well as output transactions
+## From output files - Hash of parent transactions
+## Add the extracted transaction hash to list "list_tx_hashes"
+
 path = r"C:\Users\japje\BDAProj\Sample2015"
 for root, dir, files in os.walk(path):
     for f in files:
@@ -24,24 +32,27 @@ for root, dir, files in os.walk(path):
             for line in f:
                 ## Split the row
                 cells = line.split("\t")
-
-                ## Add transaciton to Set
+                ## Add transaciton hash to List
                 transaction_hash = cells[1]
-                
                 list_tx_hashes.append([transaction_hash])
-                
                 ## in case of input files also add txn hash of inputs to mapping
-                list_ip_txns = cells[2::2]
-                
-                list_tx_hashes.append(list_ip_txns)
+                if "input" in f:
+                    list_ip_txns = cells[2::2]
+                    list_tx_hashes.append(list_ip_txns)
             
+## flatten the list
 list_tx_hashes = [item for sublist in list_tx_hashes for item in sublist]                
+## TypeCast to "set" data structure
 list_tx_hashes = set(list_tx_hashes)
+## Create a mapping from set - By assigning the IDs to transactions starting from 0
 txn_mapping = dict(zip(list_tx_hashes, range(len(list_tx_hashes))))
+## Memory management - Detete the original list
 del list_tx_hashes
 
-## Creating transaction - Unix time mapping
-
+## Creating {Transaction ID - Unix timestamp} mapping
+## Traverse the text files line by line
+## Parse timestamp and transaction hash
+## Use the previous mapping and map each integer Transaction ID to respective timestamp
 mapping_tx_time = {}
 for root, dir, files in os.walk(path):
     for f in files:
@@ -53,10 +64,6 @@ for root, dir, files in os.walk(path):
                 mapping_tx_time[txn_id] = unix_time
         print("done " + str(f))
             
-
-## Creating the mapping
-
-
 
 ## Generation of output mapping
 ## 1. txnID -> [OutputIDs]
