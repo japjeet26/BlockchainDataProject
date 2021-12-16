@@ -17,7 +17,7 @@ df_ransomware_addr = pd.read_csv(r'C:\Users\japje\BDAProj\Working iGraph\ransomw
 set_ransomware = set(list(df_ransomware_addr))
 
 #graph = "read graph here"
-graph_all = ig.Graph.Read_Picklez(r'C:\Users\japje\BDAProj\Working iGraph\Graph2010.gzip')
+graph_all = ig.Graph.Read_Picklez(r'C:\Users\japje\BDAProj\Working iGraph\Graph2015.gzip')
 
 
 all_days = []
@@ -113,9 +113,18 @@ df_all_features = pd.concat(all_days)
 
 ### Add the ransomware/non-ransomware flag randomly (5-95)
 
-label_df = pd.DataFrame(list(set(df_all_features['address'])), columns= ['address'])
-label_df['label'] = np.random.choice([0, 1], size=len(label_df.index), p=[.95, .05])
+# label_df = pd.DataFrame(list(set(df_all_features['address'])), columns= ['address'])
+# label_df['label'] = np.random.choice([0, 1], size=len(label_df.index), p=[.95, .05])
+
+## BitcoinHeist complete Data
+df_bitcoin_heist = pd.read_csv(r'C:\Users\japje\BDAProj\BitcoinHeist\BitcoinHeistData.csv')
+
+label_df = df_bitcoin_heist[['address','label']].drop_duplicates()
+
+del df_bitcoin_heist
 
 df_all_features = df_all_features.merge(label_df, on = 'address', how = 'left')
 df_all_features['weight (BTCH)'].fillna(0, inplace = True)
-df_all_features.to_csv(r'C:\Users\japje\BDAProj\Working iGraph/features_2010_new.csv', index=False, header=True, columns = ['day', 'address', 'sum in-degree', 'sum out-degree (BTCH)', 'sum in-amount', 'sum out-amount (BTCH)', 'count (BTCH)', 'weight (BTCH)', 'label'])
+df_all_features['label'].fillna(0, inplace = True)
+df_all_features['label_final'] = np.where(df_all_features['label'].isin([0, 'white']), 0, 1 )
+df_all_features.to_csv(r'C:\Users\japje\BDAProj\Working iGraph/features_2015_new.csv', index=False, header=True, columns = ['day', 'address', 'sum in-degree', 'sum out-degree (BTCH)', 'sum in-amount', 'sum out-amount (BTCH)', 'count (BTCH)', 'weight (BTCH)', 'label', 'label_final'])
